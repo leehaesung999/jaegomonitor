@@ -244,7 +244,7 @@ if uploaded:
             bg = BG.get(result_df.at[row.name, "_color"], "#FFFFFF")
             return [f"background-color: {bg}"] * len(row)
 
-        styled = display_df.style.apply(row_style, axis=1).applymap(
+        styled = display_df.style.apply(row_style, axis=1).map(
             lambda _: "font-weight: bold", subset=["등록 유통기한"]
         )
 

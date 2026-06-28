@@ -140,11 +140,11 @@ def analyze_item(df: pd.DataFrame, code: str, target_exp: str):
         return 품목명, "위험", "red", f"이후 유통기한 출고진행 중: {', '.join(이후_출고)}", 출고중_목록
 
     if t["in_출고"]:
-        return 품목명, "주의", "orange", f"동일 유통기한({target_exp}) 출고진행 중", 출고중_목록
+        return 품목명, "주의(락 점검)", "orange", f"동일 유통기한({target_exp}) 출고진행 중", 출고중_목록
 
     if not t["has_lock_free"] and 직전 and exp_info[직전]["in_출고"]:
         return (
-            품목명, "주의", "orange",
+            품목명, "주의(락 점검)", "orange",
             f"직전 유통기한({직전}) 출고진행 중  /  락 없는 동일 유통기한 재고 없음",
             출고중_목록,
         )
@@ -159,7 +159,11 @@ st.set_page_config(page_title="유통기한 재고 모니터", layout="wide", pa
 st.title("📦 유통기한 재고 출고 모니터")
 
 # ── 품목 등록 (숨김 토글) ──────────────────────────────────────────────────
-show_register = st.checkbox("⚙️ 품목 등록/삭제 열기", value=False)
+col_cb, col_desc = st.columns([2, 5])
+with col_cb:
+    show_register = st.checkbox("⚙️ 품목 등록/삭제 열기", value=False)
+with col_desc:
+    st.markdown("**신규 파우치 품목코드 유통기한 등록**")
 
 if show_register:
     with st.container(border=True):
@@ -240,7 +244,9 @@ if uploaded:
             bg = BG.get(result_df.at[row.name, "_color"], "#FFFFFF")
             return [f"background-color: {bg}"] * len(row)
 
-        styled = display_df.style.apply(row_style, axis=1)
+        styled = display_df.style.apply(row_style, axis=1).applymap(
+            lambda _: "font-weight: bold", subset=["등록 유통기한"]
+        )
 
         # 요약 카운트
         cnt_red    = (result_df["_color"] == "red").sum()
@@ -261,7 +267,7 @@ if uploaded:
 
 | 색상 | 의미 |
 |------|------|
-| 🔴 빨간 (위험) | 등록 유통기한보다 **이후** 유통기한이 출고 진행 중 |
-| 🟠 주황 (주의) | **동일** 유통기한 출고 진행 중  ·  또는  ·  락 없는 동일 유통기한 재고 없고 **직전** 유통기한 출고 진행 중 |
+| 🔴 빨간 (위험) — 역순출고 우려 | 등록 유통기한보다 **이후** 유통기한이 출고 진행 중 |
+| 🟠 주황 (주의) — 신규파우치 출고 임박 (락해제 점검 필요) | **동일** 유통기한 출고 진행 중  ·  또는  ·  락 없는 동일 유통기한 재고 없고 **직전** 유통기한 출고 진행 중 |
 | ⬜ 색 없음 (정상) | 락 없는 동일 유통기한 재고 있음 |
         """)

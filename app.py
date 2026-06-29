@@ -271,3 +271,21 @@ if uploaded:
 | 🟠 주황 (주의) — 신규파우치 출고 임박 (락해제 점검 필요) | **동일** 유통기한 출고 진행 중  ·  또는  ·  락 없는 동일 유통기한 재고 없고 **직전** 유통기한 출고 진행 중 |
 | ⬜ 색 없음 (정상) | 락 없는 동일 유통기한 재고 있음 |
         """)
+
+        st.markdown("""
+<div style="
+    background-color: #FFF3CD;
+    border: 3px solid #FF0000;
+    border-radius: 8px;
+    padding: 18px 24px;
+    margin-top: 16px;
+    text-align: center;
+">
+    <span style="font-size: 22px; font-weight: 900; color: #CC0000;">
+        ⚠️ 락 해제 시 메일 발송 필수
+    </span><br>
+    <span style="font-size: 17px; font-weight: 700; color: #333;">
+        수신 : 영업팀 전부 &nbsp;|&nbsp; 참조 : SCM
+    </span>
+</div>
+""", unsafe_allow_html=True)
